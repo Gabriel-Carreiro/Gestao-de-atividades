@@ -1,0 +1,8 @@
+# depslib dependency file v1.0
+1673381119 source:c:\users\gabri\onedrive\documentos\github\projeto-c-unificado\projeto-c\main.c
+	<stdio.h>
+	<stdlib.h>
+	<locale.h>
+	<string.h>
+	<time.h>
+
