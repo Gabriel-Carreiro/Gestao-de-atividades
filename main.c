@@ -9,7 +9,6 @@
 #define MAX_I 10000
 #define MAX_CARACT 50
 
-
  typedef struct {
     int dia, mes, ano, hora, minuto, segundo;
 } t_data_hora;
@@ -30,7 +29,7 @@ typedef struct {
 typedef struct {
     int id_ins, id_ins_part, id_ins_ativ;
     float valor_ins_ativ;
-    struct tm data_hora_atual;
+    struct tm data_hora_atual; //Armazena data e hora atual do PC
 } t_inscricao;
 
 int menu_principal();
@@ -38,6 +37,7 @@ int menu_registros(t_participante participante[], t_atividade atividade[], t_ins
 int menu_estatisticas(t_participante participante[], t_atividade atividade[], t_inscricao inscricao[],int ultimo_participante, int ultima_atividade, int ultima_inscricao);
 int menu_consultas(t_participante participante[], t_atividade atividade[], t_inscricao inscricao[],int ultimo_participante, int ultima_atividade, int ultima_inscricao);
 void limpar_console();
+long validar_numero();
 int validar_email(char *email);
 int validar_data(t_data_hora data_hora);
 int validar_hora(t_data_hora data_hora);
@@ -57,20 +57,13 @@ void inscricao_por_escola(t_participante participante[], int ultimo_participante
 void ler_ficheiros(t_participante participante[], t_atividade atividade[], t_inscricao inscricao[], int *ultimo_participante, int *ultima_inscricao, int *ultima_atividade);
 void gravar_ficheiros(t_participante participante[], t_atividade atividade[], t_inscricao inscricao[], int ultimo_participante, int ultima_inscricao, int ultima_atividade);
 
-
 int main(){
-    setlocale(LC_ALL, "Portuguese");
     int resposta, ultimo_participante, ultima_atividade, ultima_inscricao;
-
 
     t_participante participante[MAX_P];
     t_atividade atividade[MAX_A];
     t_inscricao inscricao[MAX_I];
-    printf("%d %d %d\n", ultima_inscricao,ultimo_participante,ultima_atividade);
     ler_ficheiros(participante,atividade,inscricao,&ultimo_participante,&ultima_inscricao,&ultima_atividade);
-
-    printf("inscr %d partic %d ativi %d", ultima_inscricao,ultimo_participante,ultima_atividade);
-
 
     do{
         resposta = menu_principal();
@@ -98,35 +91,27 @@ int main(){
 }
 int menu_principal(){
     int resposta;
-    //limpar_console();
 
-    printf("\n*****Menu principal*****\n");
+    printf("*****Menu principal*****\n\n");
     printf("1-Registrar\n");
     printf("2-Consultar\n");
     printf("3-Estatisticas\n");
     printf("4-Salvar\n");
-    printf("0-Sair\n");
+    printf("0-Sair\n\n");
     printf("************************\n");
 
-    scanf("%d", &resposta);
+    resposta = validar_numero();
+    limpar_console();
 
     return resposta;
 }
-
 int menu_registros(t_participante participante[], t_atividade atividade[], t_inscricao inscricao[],int *ultimo_participante, int *ultima_atividade, int *ultima_inscricao){
     int resposta;
     int id_part, id_ativ;
 
     do{
-        printf("\n*****Menu de registros*****\n");
-        printf("1-Registrar participantes\n");
-        printf("2-Registrar atividades\n");
-        printf("3-Registrar inscricoes\n");
-        printf("0-Sair\n");
-        printf("***************************\n");
-
-        scanf("%d", &resposta);
-
+        printf("\n*****Menu de registros*****\n1-Registrar participantes\n2-Registrar atividades\n3-Registrar inscricoes\n0-Sair\n***************************\n");
+        resposta = validar_numero();
         switch(resposta){
             case 1:
                 registrar_participante(participante, atividade, ultimo_participante);
@@ -137,9 +122,9 @@ int menu_registros(t_participante participante[], t_atividade atividade[], t_ins
             case 3:
                 if(ultimo_participante > 0 && ultima_atividade > 0){
                     printf("Digite o Id do participante: ");
-                    scanf("%d", &id_part);
+                    id_part = validar_numero();
                     printf("Digite o Id da atividade: ");
-                    scanf("%d", &id_ativ);
+                    id_ativ = validar_numero();
                     registrar_inscricoes(inscricao, atividade,participante, id_part, id_ativ, ultima_inscricao);
                 }
                 else
@@ -147,38 +132,27 @@ int menu_registros(t_participante participante[], t_atividade atividade[], t_ins
                 break;
             default:
                 if(resposta != 0)
-                    printf("Digite o numero correspondente a uma das op�oes do menu\n");
+                    printf("Digite o numero correspondente a uma das opcoes do menu\n");
         }
     } while(resposta != 0);
-
+    limpar_console();
     return resposta+1;// retorna true para voltar ao menu_principal
 }
-
 int menu_consultas(t_participante participante[], t_atividade atividade[], t_inscricao inscricao[],int ultimo_participante, int ultima_atividade, int ultima_inscricao){
     int resposta, busca, encontrado, tipo_busca;
     char busca_designacao[MAX_CARACT];
-
     limpar_console();
-
     do{
-        printf("\n*****Menu de consultas*****\n");
-        printf("1-Consultar participantes\n");
-        printf("2-Consultar atividades\n");
-        printf("3-Consultar inscricoes\n");
-        printf("0-Sair\n");
-        printf("***************************\n");
-
-        scanf("%d", &resposta);
-
+        printf("*****Menu de consultas*****\n\n1-Consultar participantes\n2-Consultar atividades\n3-Consultar inscricoes\n0-Sair\n\n***************************\n");
+        resposta = validar_numero();
         switch(resposta){
             case 1:
                 limpar_console();
                 printf("1- Se deseja buscar individualmente pelo NIF do participante\n2- Se deseja uma lista com todos os participantes\n3- Sair\n");
-                scanf("%d", &tipo_busca);
-
+                tipo_busca = validar_numero();
                 if(tipo_busca == 1){
                     printf("Digite o NIF do participante: ");
-                    scanf("%d", &busca);
+                    busca = validar_numero();
                 }
                 else if(tipo_busca == 2)//buscar todos os participantes da lista
                     busca = -1;
@@ -195,32 +169,32 @@ int menu_consultas(t_participante participante[], t_atividade atividade[], t_ins
                     printf("Atividade nao encontrada!\n");
                 break;
             case 3:
-                printf("Digite o Id da inscri��o: ");
-                scanf("%d", &busca);
+                printf("Digite o Id da inscricao: ");
+                busca = validar_numero();
                 consultar_inscricoes(inscricao, busca, ultima_inscricao);
                 break;
             default:
                 if(resposta != 0)
-                    printf("Digite o numero correspondente a uma das op�oes do menu\n");
+                    printf("Digite o numero correspondente a uma das opcoes do menu\n");
         }
     }while(resposta != 0);
+    limpar_console();
     return resposta+1;// retorna true para voltar ao menu_principal
 }
-
 int menu_estatisticas(t_participante participante[], t_atividade atividade[], t_inscricao inscricao[],int ultimo_participante, int ultima_atividade, int ultima_inscricao){
     int resposta;
     t_data_hora data[2];
     limpar_console();
 
     do{
-        printf("\n*****Menu de estatisticas*****\n");
-        printf("1-N�mero de atividades realizadas por cada associacao\n");
-        printf("2-Percentagem de inscri��es por escola\n");
-        printf("3-Valor total das inscri��es entre duas datas (horizonte temporal) por tipo de atividade\n");
-        printf("0-Sair\n");
+        printf("\n*****Menu de estatisticas*****\n\n");
+        printf("1-Numero de atividades realizadas por cada associacao\n");
+        printf("2-Percentagem de inscricoes por escola\n");
+        printf("3-Valor total das inscricoes entre duas datas (horizonte temporal) por tipo de atividade\n");
+        printf("0-Sair\n\n");
         printf("******************************\n");
 
-        scanf("%d", &resposta);
+        resposta = validar_numero();
 
         switch(resposta){
             case 1:
@@ -230,20 +204,20 @@ int menu_estatisticas(t_participante participante[], t_atividade atividade[], t_
                 inscricao_por_escola(participante, ultimo_participante, ultima_inscricao);
                 break;
             case 3:
-                printf("Digite as datas\n");
+                printf("Digite as datas (DD/MM/AA):\n");
                 scanf("%d/%d/%d", &data[0].dia, &data[0].mes, &data[0].ano);
                 scanf("%d/%d/%d", &data[1].dia, &data[1].mes, &data[1].ano);
                 horizonte_temporal_inscricao(inscricao, atividade, data[0], data[1], ultima_inscricao);
                 break;
             default:
                 if(resposta != 0)
-                    printf("Digite o numero correspondente a uma das op�oes do menu\n");
+                    printf("Digite o numero correspondente a uma das opcoes do menu\n");
         }
 
     }while(resposta != 0);
+    limpar_console();
     return resposta+1;// retorna true para voltar ao menu_principal
 }
-
 void limpar_console(){
     system("cls");
 }
@@ -258,11 +232,9 @@ long validar_numero(){
     } while(val < 1);
     return numero;
 }
-
 int validar_email(char *email) {
     int tam = strlen(email), i, arroba, ponto, antesPonto, depoisPonto;
     arroba = ponto = antesPonto = depoisPonto = 0;
-
     for (i = 0; i < tam; i++) {
         char c = email[i];
         if (c == '@') {  // Verifica se tem arroba
@@ -282,16 +254,13 @@ int validar_email(char *email) {
             }
             else
                 antesPonto++;
-
         }
     }
-
     if (i == tam && depoisPonto > 1)
         return 1;
     else
         return 0;
 }
-
 int validar_data(t_data_hora data_hora){
     if (data_hora.ano >= 1900 && data_hora.ano <= 2050){
         if (data_hora.mes >= 1 && data_hora.mes <= 12){
@@ -305,7 +274,6 @@ int validar_data(t_data_hora data_hora){
     }
     return 0;// Retorna 0 caso algum dos datos nao seja valido
 }
-
 int validar_hora(t_data_hora data_hora){
 
     printf("%d:%d",data_hora.hora, data_hora.minuto);
@@ -317,12 +285,11 @@ int validar_hora(t_data_hora data_hora){
         return 0;
     return 1;
 }
-
 int validar_nif(t_participante participante[], int ultimo_participante){
     int i;
     for(i = 0; i < ultimo_participante; i++)
     if(participante[i].nif == participante[ultimo_participante].nif){
-        printf("ERRO: NIF já cadastrado\n");
+        printf("ERRO: NIF já existente\n");
         return 1;
     }
     if(participante[ultimo_participante].nif < 100000000){
@@ -330,7 +297,7 @@ int validar_nif(t_participante participante[], int ultimo_participante){
         return 2;
     }
     if(participante[ultimo_participante].nif > 500000000){
-        printf("Somente pode se cadastrar com NIF de pessoa singular\n");
+        printf("NIF tem de ser de pessoa singular\n");
         return 3;
     }
     return 0;
@@ -338,11 +305,9 @@ int validar_nif(t_participante participante[], int ultimo_participante){
 void imprimir_data(t_data_hora data_hora){
     printf("%d/%d/%d\n", data_hora.dia, data_hora.mes, data_hora.ano);
 }
-
 void imprimir_hora(t_data_hora data_hora){
     printf("%d:%d\n", data_hora.hora, data_hora.minuto);
 }
-
 void registrar_participante(t_participante participante[], t_atividade atividade[], int *ultimo_participante){
     int resposta_escola, email_valido, i;
     getchar();
@@ -357,7 +322,7 @@ void registrar_participante(t_participante participante[], t_atividade atividade
     gets(participante[i].email);
     email_valido = validar_email(participante[i].email);
     while (email_valido == 0){
-        printf("email invalido, tente novamente\n Email: ");
+        printf("email invalido, tente novamente\nEmail: ");
         gets(participante[i].email);
         email_valido = validar_email(participante[i].email);
     };
@@ -373,16 +338,16 @@ void registrar_participante(t_participante participante[], t_atividade atividade
     } while(validar_nif(participante, i) != 0);
     printf("Telefone: ");
     participante[i].telefone = validar_numero();
-    printf("Cadastro realizado, Id: %d Nome: %s \n",participante[i].id_part, participante[i].nome);
+    printf("Registo realizado, Id: %d Nome: %s \n",participante[i].id_part, participante[i].nome);
+    limpar_console();
     *ultimo_participante = i +1;
 }
-
 int consultar_participante(t_participante participante[], int busca, int ultimo_participante){
     int encontrado, i;
     limpar_console();
 
     if(ultimo_participante < 1){
-        printf("Não há participantes salvos\n");
+        printf("Nao existem  participantes salvos\n");
         encontrado = 2; //Nao há participantes na lista
     }
     else{
@@ -400,7 +365,6 @@ int consultar_participante(t_participante participante[], int busca, int ultimo_
     }
     return encontrado;
 }
-
 void registrar_atividade(t_atividade atividade[], int *ultima_atividade, t_participante participante[]){
     int resposta_escola,tipo_atividade, data_valida, hora_valida, i = *ultima_atividade;
 
@@ -408,18 +372,18 @@ void registrar_atividade(t_atividade atividade[], int *ultima_atividade, t_parti
     getchar();
     atividade[i].id_ativ = i;
     printf("Id: %d\n", atividade[i].id_ativ);
-    printf("Designação: ");
+    printf("Designacao: ");
     gets(atividade[i].designacao);
     printf("Local: ");
     gets(atividade[i].local);
-    printf("Tipo de atividade:1-Academica 2-lazer 3-cultura 4-desporto 5-formacao 6-outra\nInsira o numero correspondente ao tipo de atividade: ");
+    printf("Tipo de atividade:1-Academica 2-Lazer 3-Cultura 4-Desporto 5-Formacao 6-Outra\nInsira o numero correspondente ao tipo de atividade: ");
     tipo_atividade = validar_numero();
     identificador_atividade(atividade, tipo_atividade, i);
     fflush(stdin);
     printf("Digite o numero correspontende a associação de estudantes organizadora\n1- AE-ESTG 2- AE-ESECS 3- AE-ESSLEI 4- AE-ESAD 5- AE-ESTM: ");
     resposta_escola = validar_numero();
     identificador_escola(participante, atividade, resposta_escola, i, 1);
-    printf("Valor da inscrição: ");
+    printf("Valor da inscricao: ");
     scanf("%f", &atividade[i].valor_inscricao);
     do {
         printf("Data (DD/MM/YYYY): ");
@@ -438,7 +402,6 @@ void registrar_atividade(t_atividade atividade[], int *ultima_atividade, t_parti
 
     *ultima_atividade = i + 1;
 }
-
 int consultar_atividade(t_atividade atividade[], char busca_designacao[], int ultima_atividade){
 
     int i, resposta, encontrado = 0;
@@ -450,12 +413,12 @@ int consultar_atividade(t_atividade atividade[], char busca_designacao[], int ul
     }
     else{
         printf("1- Deseja ver todas\n2-Buscar por designacao\n");
-        scanf("%d", &resposta);
+        resposta = validar_numero();
         if(resposta == 1){
             for(i= 0; i < ultima_atividade; i++){
                 encontrado = 1;
-                printf("Id: %d\t Designação: %s\t Local: %s\t Tipo de atividade: %s\n",atividade[i].id_ativ, atividade[i].designacao, atividade[i].local, atividade[i].tipo_atividade);
-                printf("Associação organizadora: %s\t Valor: %.2f\t\n", atividade[i].associacao, atividade[i].valor_inscricao);
+                printf("Id: %d\t Designacao: %s\t Local: %s\t Tipo de atividade: %s\n",atividade[i].id_ativ, atividade[i].designacao, atividade[i].local, atividade[i].tipo_atividade);
+                printf("Associacao organizadora: %s\t Valor: %.2f\t\n", atividade[i].associacao, atividade[i].valor_inscricao);
                 imprimir_data(atividade[i].data_hora);
                 imprimir_hora(atividade[i].data_hora);
             }
@@ -464,8 +427,8 @@ int consultar_atividade(t_atividade atividade[], char busca_designacao[], int ul
             for(i = 0; i < ultima_atividade; i++){
                 if(strcmp(atividade[i].designacao, busca_designacao) == 0) {
                     encontrado = 1;
-                    printf("Id: %d\t Designação: %s\t Local: %s\t Tipo de atividade: %s\n",atividade[i].id_ativ, atividade[i].designacao, atividade[i].local, atividade[i].tipo_atividade);
-                    printf("Associação organizadora: %s\t Valor: %.2f\t\n", atividade[i].associacao, atividade[i].valor_inscricao);
+                    printf("Id: %d\t Designacao: %s\t Local: %s\t Tipo de atividade: %s\n",atividade[i].id_ativ, atividade[i].designacao, atividade[i].local, atividade[i].tipo_atividade);
+                    printf("Associacao organizadora: %s\t Valor: %.2f\t\n", atividade[i].associacao, atividade[i].valor_inscricao);
                     imprimir_data(atividade[i].data_hora);
                     imprimir_hora(atividade[i].data_hora);
                 }
@@ -474,7 +437,6 @@ int consultar_atividade(t_atividade atividade[], char busca_designacao[], int ul
     }
     return encontrado;
 }
-
 void registrar_inscricoes(t_inscricao inscricao[], t_atividade atividade[],t_participante participante[], int id_part, int id_ativ, int *ultima_inscricao){
     time_t segundos;
     int i = *ultima_inscricao;
@@ -486,22 +448,21 @@ void registrar_inscricoes(t_inscricao inscricao[], t_atividade atividade[],t_par
     participante[id_part].atividades_inscritas++;
     inscricao[i].valor_ins_ativ = atividade[id_ativ].valor_inscricao;
     inscricao[i].data_hora_atual = *localtime(&segundos);
-    printf("Data e hora da inscrição: %d/%d/%d   %d:%d\n", inscricao[i].data_hora_atual.tm_mday, inscricao[i].data_hora_atual.tm_mon+1, inscricao[i].data_hora_atual.tm_year+1900, inscricao[i].data_hora_atual.tm_hour, inscricao[i].data_hora_atual.tm_min);
+    printf("Data e hora da inscricao: %d/%d/%d   %d:%d\n", inscricao[i].data_hora_atual.tm_mday, inscricao[i].data_hora_atual.tm_mon+1, inscricao[i].data_hora_atual.tm_year+1900, inscricao[i].data_hora_atual.tm_hour, inscricao[i].data_hora_atual.tm_min);
     printf("Id participante = %d, Id atividade = %d, valor = %.2f", inscricao[i].id_ins_part, inscricao[i].id_ins_ativ, inscricao[i].valor_ins_ativ);
     *ultima_inscricao = i + 1;
 }
-
 void consultar_inscricoes(t_inscricao inscricao[], int id_ins, int ultima_inscricao){
     int i, encontrado;
 
     if(ultima_inscricao < 1){
-        printf("Não há inscrição salva\n");
+        printf("Não existem inscrição salva\n");
         encontrado = 2; //Nao há inscrição na lista
     }
     else{
         for(i = 0; i < ultima_inscricao; i++){
             if(inscricao[i].id_ins == id_ins){
-                printf("Id inscrição: %d\n", inscricao[i].id_ins);
+                printf("Id inscricao: %d\n", inscricao[i].id_ins);
                 printf("Id participante: %d\n", inscricao[i].id_ins_part);
                 printf("Id atividade: %d\n", inscricao[i].id_ins_ativ);
                 printf("Valor pago: %.2f\n", inscricao[i].valor_ins_ativ);
@@ -510,16 +471,15 @@ void consultar_inscricoes(t_inscricao inscricao[], int id_ins, int ultima_inscri
             }
         }
         if (encontrado != 1)
-            printf("Inscrição nao encontrada\n");
+            printf("Inscricao nao encontrada\n");
     }
 }
-
 void atividade_por_associacao(t_atividade atividade[], int ultima_atividade){
     int i, ESTG, ESECS, ESSLEI, ESAD, ESTM;
     ESTG = ESECS = ESSLEI = ESAD = ESTM = 0;
-
+    limpar_console();
     if(ultima_atividade < 1)
-        printf("Não há atividades salvas no arquivo\n");
+        printf("Não existem atividades salvas no arquivo\n");
     else{
         for(i = 0; i < ultima_atividade; i++){
                 if(strcmp(atividade[i].associacao, "AE-ESTG") == 0){
@@ -543,7 +503,6 @@ void atividade_por_associacao(t_atividade atividade[], int ultima_atividade){
         printf("AE-ESTG: %d\nAE-ESECS: %d\nAE-ESSLEI: %d\nAE-ESAD: %d\nAE-ESTM: %d\n", ESTG, ESECS, ESSLEI, ESAD, ESTM);
     }
 }
-
 void horizonte_temporal_inscricao(t_inscricao inscricao[], t_atividade atividade[], t_data_hora data1, t_data_hora data2, int ultima_inscricao){
     long i, soma_data1, soma_data2, soma_data_inscricao[MAX_I], academica, lazer, cultura, desporto, formacao, outra;
     academica = lazer = cultura = desporto = formacao = outra = 0;
@@ -551,7 +510,7 @@ void horizonte_temporal_inscricao(t_inscricao inscricao[], t_atividade atividade
     soma_data2 = data2.ano*365+data2.mes*31+data2.dia;
 
     if(ultima_inscricao < 1)
-        printf("Não há inscrições no arquivo\n");
+        printf("Não existem inscricoes no arquivo\n");
     else{
         for(i = 0; i < ultima_inscricao; i++){
             soma_data_inscricao[i] = (inscricao[i].data_hora_atual.tm_year+1900)*365+(inscricao[i].data_hora_atual.tm_mon+1)*31+inscricao[i].data_hora_atual.tm_mday;
@@ -573,7 +532,6 @@ void horizonte_temporal_inscricao(t_inscricao inscricao[], t_atividade atividade
         printf("Academica: %ld\nLazer: %ld\nCultura: %ld\nDesporto: %ld\nFormação: %ld\nOutra: %ld", academica, lazer, cultura, desporto, formacao, outra);
     }
 }
-
 void identificador_escola(t_participante participante[], t_atividade atividade[], int resposta, int final_lista, int associacao_estudante){
 
     if(associacao_estudante == 0){
@@ -638,33 +596,26 @@ void identificador_atividade(t_atividade atividade[], int resposta, int final_li
             break;
     }
 }
-
 void inscricao_por_escola(t_participante participante[], int ultimo_participante, int ultima_inscricao){
     int i, total_inscricao = ultima_inscricao;
     float ESTG, ESECS, ESSLEI, ESAD, ESTM;
     ESTG = ESECS = ESSLEI = ESAD = ESTM = 0;
-
-    if(ultima_inscricao < 1){
-        printf("Não há registro de inscrições salvos\n");
-    }
+    limpar_console();
+    if(ultima_inscricao < 1)
+        printf("Não existem inscricoes salvos\n");
     else{
         for(i = 0; i < ultima_inscricao; i++){
             if(participante[i].atividades_inscritas > 0){
-                if(strcmp(participante[i].escola, "ESTG") == 0){
+                if(strcmp(participante[i].escola, "ESTG") == 0)
                     ESTG += participante[i].atividades_inscritas;
-                }
-                else if(strcmp(participante[i].escola, "ESECS") == 0){
+                else if(strcmp(participante[i].escola, "ESECS") == 0)
                     ESECS += participante[i].atividades_inscritas;
-                }
-                else if(strcmp(participante[i].escola, "ESSLEI") == 0){
+                else if(strcmp(participante[i].escola, "ESSLEI") == 0)
                     ESSLEI += participante[i].atividades_inscritas;
-                }
-                else if(strcmp(participante[i].escola, "ESAD") == 0){
+                else if(strcmp(participante[i].escola, "ESAD") == 0)
                     ESAD += participante[i].atividades_inscritas;
-                }
-                else if(strcmp(participante[i].escola, "ESTM") == 0){
+                else if(strcmp(participante[i].escola, "ESTM") == 0)
                     ESTM += participante[i].atividades_inscritas;
-                }
             }
         }
         printf("Total de %d inscricoes\n", total_inscricao);
@@ -674,15 +625,10 @@ void inscricao_por_escola(t_participante participante[], int ultimo_participante
             ESSLEI = (ESSLEI * 100)/ (total_inscricao);
             ESAD = (ESAD * 100) / (total_inscricao);
             ESTM =(ESTM * 100) / (total_inscricao);
-            printf("ESTG: %.2f%%\n", ESTG);
-            printf("ESECS: %.2f%%\n", ESECS);
-            printf("ESSLEI: %.2f%%\n", ESSLEI);
-            printf("ESAD: %.2f%%\n", ESAD);
-            printf("ESTM: %.2f%%\n", ESTM);
+            printf("ESTG: %.2f%%\nESECS: %.2f%%\nESSLEI: %.2f%%\nESAD: %.2f%%\nESTM: %.2f%%\n",ESTG, ESECS, ESSLEI, ESAD, ESTM);
         }
     }
 }
-
 void ler_ficheiros(t_participante participante[], t_atividade atividade[], t_inscricao inscricao[], int *ultimo_participante, int *ultima_inscricao, int *ultima_atividade){
     size_t fSize;
     int i;
@@ -699,9 +645,8 @@ void ler_ficheiros(t_participante participante[], t_atividade atividade[], t_ins
         fclose(participantes);
         *ultimo_participante = i;
     }
-    else{
+    else
         printf("ERRO: nao foi possivel abrir o arquivo de participantes. \n\n");
-        }
 
     atividades = fopen("atividades.dat","rb");
     if(atividades){
@@ -712,9 +657,8 @@ void ler_ficheiros(t_participante participante[], t_atividade atividade[], t_ins
         fread(atividade, sizeof(t_atividade), *ultima_atividade, atividades);
         fclose(atividades);
     }
-    else{
+    else
         printf("ERRO: nao foi possivel abrir o arquivo de atividades. \n\n");
-        }
 
     inscricoes = fopen("inscricoes.dat","rb");
     if(inscricoes){
@@ -725,9 +669,8 @@ void ler_ficheiros(t_participante participante[], t_atividade atividade[], t_ins
         fread(inscricao, sizeof(t_inscricao), *ultima_inscricao, inscricoes);
         fclose(inscricoes);
     }
-    else{
+    else
         printf("ERRO: nao foi possivel abrir o arquivo de inscrições. \n\n");
-        }
 }
 void gravar_ficheiros(t_participante participante[], t_atividade atividade[], t_inscricao inscricao[], int ultimo_participante, int ultima_inscricao, int ultima_atividade){
     FILE *participantes;
@@ -739,26 +682,23 @@ void gravar_ficheiros(t_participante participante[], t_atividade atividade[], t_
         fwrite(participante, sizeof(t_participante), ultimo_participante, participantes);
         fclose(participantes);
     }
-    else{
+    else
         printf("ERRO: nao foi possivel gravar o arquivo de participantes. \n\n");
-        }
 
     atividades = fopen("atividades.dat","wb");
     if(atividades){
         fwrite(atividade, sizeof(t_atividade), ultima_atividade, atividades);
         fclose(atividades);
     }
-    else{
+    else
         printf("ERRO: nao foi possivel gravar o arquivo de atividades. \n\n");
-        }
 
     inscricoes = fopen("inscricoes.dat","wb");
     if(inscricoes){
         fwrite(inscricao, sizeof(t_inscricao), ultima_inscricao, inscricoes);
         fclose(inscricoes);
     }
-    else{
+    else
         printf("ERRO: nao foi possivel gravar o arquivo de inscrições. \n\n");
-        }
 }
 
