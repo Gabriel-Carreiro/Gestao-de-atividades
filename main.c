@@ -449,7 +449,7 @@ void registrar_inscricoes(t_inscricao inscricao[], t_atividade atividade[],t_par
     inscricao[i].valor_ins_ativ = atividade[id_ativ].valor_inscricao;
     inscricao[i].data_hora_atual = *localtime(&segundos);
     printf("Data e hora da inscricao: %d/%d/%d   %d:%d\n", inscricao[i].data_hora_atual.tm_mday, inscricao[i].data_hora_atual.tm_mon+1, inscricao[i].data_hora_atual.tm_year+1900, inscricao[i].data_hora_atual.tm_hour, inscricao[i].data_hora_atual.tm_min);
-    printf("Id participante = %d, Id atividade = %d, valor = %.2f", inscricao[i].id_ins_part, inscricao[i].id_ins_ativ, inscricao[i].valor_ins_ativ);
+    printf("Id participante = %d, Id atividade = %d, valor = %.2f\n", inscricao[i].id_ins_part, inscricao[i].id_ins_ativ, inscricao[i].valor_ins_ativ);
     *ultima_inscricao = i + 1;
 }
 void consultar_inscricoes(t_inscricao inscricao[], int id_ins, int ultima_inscricao){
@@ -642,7 +642,6 @@ void ler_ficheiros(t_participante participante[], t_atividade atividade[], t_ins
         i = fSize/sizeof(t_participante);
         fseek(participantes, 0L, SEEK_SET);
         fread(participante, sizeof(t_participante), i, participantes);
-        fclose(participantes);
         *ultimo_participante = i;
     }
     else
@@ -655,7 +654,6 @@ void ler_ficheiros(t_participante participante[], t_atividade atividade[], t_ins
         *ultima_atividade = fSize/sizeof(t_atividade);
         fseek(atividades, 0L, SEEK_SET);
         fread(atividade, sizeof(t_atividade), *ultima_atividade, atividades);
-        fclose(atividades);
     }
     else
         printf("ERRO: nao foi possivel abrir o arquivo de atividades. \n\n");
@@ -667,10 +665,13 @@ void ler_ficheiros(t_participante participante[], t_atividade atividade[], t_ins
         *ultima_inscricao = fSize/sizeof(t_inscricao);
         fseek(inscricoes, 0L, SEEK_SET);
         fread(inscricao, sizeof(t_inscricao), *ultima_inscricao, inscricoes);
-        fclose(inscricoes);
     }
     else
         printf("ERRO: nao foi possivel abrir o arquivo de inscrições. \n\n");
+
+    fclose(participantes);
+    fclose(atividades);
+    fclose(inscricoes);
 }
 void gravar_ficheiros(t_participante participante[], t_atividade atividade[], t_inscricao inscricao[], int ultimo_participante, int ultima_inscricao, int ultima_atividade){
     FILE *participantes;
@@ -678,27 +679,26 @@ void gravar_ficheiros(t_participante participante[], t_atividade atividade[], t_
     FILE *inscricoes;
 
     participantes = fopen("participantes.dat","wb");
-    if(participantes){
+    if(participantes)
         fwrite(participante, sizeof(t_participante), ultimo_participante, participantes);
-        fclose(participantes);
-    }
     else
         printf("ERRO: nao foi possivel gravar o arquivo de participantes. \n\n");
 
     atividades = fopen("atividades.dat","wb");
-    if(atividades){
+    if(atividades)
         fwrite(atividade, sizeof(t_atividade), ultima_atividade, atividades);
-        fclose(atividades);
-    }
     else
         printf("ERRO: nao foi possivel gravar o arquivo de atividades. \n\n");
 
     inscricoes = fopen("inscricoes.dat","wb");
-    if(inscricoes){
+    if(inscricoes)
         fwrite(inscricao, sizeof(t_inscricao), ultima_inscricao, inscricoes);
-        fclose(inscricoes);
-    }
     else
         printf("ERRO: nao foi possivel gravar o arquivo de inscrições. \n\n");
+
+    fclose(participantes);
+    fclose(atividades);
+    fclose(inscricoes);
+
 }
 
